@@ -12,24 +12,15 @@
 # Haskell Program Coverage
 /.hpc
 
-# Leksah
-*.lkshs
-
 # Intellij IDEA
 /.idea
-
-# darcs
-/_darcs
-
-# ctags
-TAGS
-
-# sbt
-/project
-/target
+*.iml
 
 *.swp
 
 # Stack
 .stack-work/
+*.yaml
+
+
 

@@ -71,12 +71,12 @@ foldLeft f b (h :. t) = let b' = f b h in b' `seq` foldLeft f b' t
 -- prop> x `headOr` infinity == 0
 --
 -- prop> x `headOr` Nil == x
-headOr ::
-  a
-  -> List a
-  -> a
-headOr =
-  foldRight const
+
+--headOr ::
+--  a
+--  -> List a
+--  -> a
+
 
 -- | The product of the elements of a list.
 --
@@ -88,11 +88,10 @@ headOr =
 --
 -- >>> product (1 :. 2 :. 3 :. 4 :. Nil)
 -- 24
-product ::
-  List Int
-  -> Int
-product =
-  foldLeft (*) 1
+
+--product ::
+--  List Int
+--  -> Int
 
 -- | Sum the elements of the list.
 --
@@ -103,11 +102,11 @@ product =
 -- 10
 --
 -- prop> foldLeft (-) (sum x) x == 0
-sum ::
-  List Int
-  -> Int
-sum =
-  foldLeft (+) 0
+
+--sum ::
+--  List Int
+--  -> Int
+
 
 -- | Return the length of the list.
 --
@@ -129,12 +128,12 @@ length =
 -- prop> headOr x (map (+1) infinity) == 1
 --
 -- prop> map id x == x
+
 map ::
   (a -> b)
   -> List a
   -> List b
-map f =
-  foldRight (\a b -> f a :. b) Nil
+map f xs = Nil  -- todo: fix!
 
 -- | Return elements satisfying the given predicate.
 --
@@ -146,12 +145,12 @@ map f =
 -- prop> filter (const True) x == x
 --
 -- prop> filter (const False) x == Nil
+
 filter ::
   (a -> Bool)
   -> List a
   -> List a
-filter f =
-  foldRight (\a -> if f a then (a:.) else id) Nil
+filter p xs = Nil  -- todo: fix!
 
 -- | Append two lists to a new list.
 --
@@ -165,14 +164,13 @@ filter f =
 -- prop> (x ++ y) ++ z == x ++ (y ++ z)
 --
 -- prop> x ++ Nil == x
-(++) ::
-  List a
-  -> List a
-  -> List a
-(++) =
-  flip (foldRight (:.))
 
-infixr 5 ++
+--(++) ::
+--  List a
+--  -> List a
+--  -> List a
+
+--infixr 5 ++
 
 -- | Flatten a list of lists to a list.
 --
@@ -184,11 +182,10 @@ infixr 5 ++
 -- prop> headOr x (flatten (y :. infinity :. Nil)) == headOr 0 y
 --
 -- prop> sum (map length x) == length (flatten x)
-flatten ::
-  List (List a)
-  -> List a
-flatten =
-  foldRight (++) Nil
+
+--flatten ::
+--  List (List a)
+--  -> List a
 
 -- | Map a function then flatten to a list.
 --
@@ -200,22 +197,21 @@ flatten =
 -- prop> headOr x (flatMap id (y :. infinity :. Nil)) == headOr 0 y
 --
 -- prop> flatMap id (x :: List (List Int)) == flatten x
+
 flatMap ::
   (a -> List b)
   -> List a
   -> List b
-flatMap f =
-  flatten . map f
+flatMap f xs = Nil -- todo: fix!
 
 -- | Flatten a list of lists to a list (again).
 -- HOWEVER, this time use the /flatMap/ function that you just wrote.
 --
 -- prop> let types = x :: List (List Int) in flatten x == flattenAgain x
-flattenAgain ::
-  List (List a)
-  -> List a
-flattenAgain =
-  flatMap id
+
+--flattenAgain ::
+--  List (List a)
+--  -> List a
 
 -- | Convert a list of optional values to an optional list of values.
 --
@@ -239,11 +235,10 @@ flattenAgain =
 --
 -- >>> seqOptional (Empty :. map Full infinity)
 -- Empty
-seqOptional ::
-  List (Optional a)
-  -> Optional (List a)
-seqOptional =
-  foldRight (twiceOptional (:.)) (Full Nil)
+
+--seqOptional ::
+--  List (Optional a)
+--  -> Optional (List a)
 
 -- | Find the first element in the list matching the predicate.
 --
@@ -261,14 +256,11 @@ seqOptional =
 --
 -- >>> find (const True) infinity
 -- Full 0
-find ::
-  (a -> Bool)
-  -> List a
-  -> Optional a
-find p x =
-  case filter p x of
-    Nil -> Empty
-    h:._ -> Full h
+
+--find ::
+--  (a -> Bool)
+--  -> List a
+--  -> Optional a
 
 -- | Determine if the length of the given list is greater than 4.
 --
@@ -283,13 +275,10 @@ find p x =
 --
 -- >>> lengthGT4 infinity
 -- True
-lengthGT4 ::
-  List a
-  -> Bool
-lengthGT4 (_:._:._:._:._:._) =
-  True
-lengthGT4 _ =
-  False
+
+--lengthGT4 ::
+--  List a
+--  -> Bool
 
 -- | Reverse a list.
 --
@@ -302,11 +291,10 @@ lengthGT4 _ =
 -- prop> let types = x :: List Int in reverse x ++ reverse y == reverse (y ++ x)
 --
 -- prop> let types = x :: Int in reverse (x :. Nil) == x :. Nil
-reverse ::
-  List a
-  -> List a
-reverse =
-  foldLeft (flip (:.)) Nil
+
+--reverse ::
+--  List a
+--  -> List a
 
 -- | Produce an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
@@ -316,11 +304,12 @@ reverse =
 --
 -- >>> let (x:.y:.z:.w:._) = produce (*2) 1 in [x,y,z,w]
 -- [1,2,4,8]
-produce ::
-  (a -> a)
-  -> a
-  -> List a
-produce f x = x :. produce f (f x)
+
+--produce ::
+--  (a -> a)
+--  -> a
+--  -> List a
+
 
 -- | Do anything other than reverse a list.
 -- Is it even possible?
@@ -331,11 +320,12 @@ produce f x = x :. produce f (f x)
 -- prop> let types = x :: List Int in notReverse x ++ notReverse y == notReverse (y ++ x)
 --
 -- prop> let types = x :: Int in notReverse (x :. Nil) == x :. Nil
-notReverse ::
-  List a
-  -> List a
-notReverse =
-  reverse -- impossible
+
+--notReverse ::
+--  List a
+--  -> List a
+--notReverse =
+--  reverse -- impossible
 -- For the sake of discussion, let's assume that,
 -- xs, ys :: List a
 -- x, y :: a

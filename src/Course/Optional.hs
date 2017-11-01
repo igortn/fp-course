@@ -27,10 +27,8 @@ mapOptional ::
   (a -> b)
   -> Optional a
   -> Optional b
-mapOptional _ Empty =
-  Empty
-mapOptional f (Full a) =
-  Full (f a)
+mapOptional _ Empty = Empty
+mapOptional f (Full x) = Full (f x)
 
 -- | Bind the given function on the possible value.
 --
@@ -46,10 +44,8 @@ bindOptional ::
   (a -> Optional b)
   -> Optional a
   -> Optional b
-bindOptional _ Empty =
-  Empty
-bindOptional f (Full a) =
-  f a
+bindOptional _ Empty = Empty
+bindOptional f (Full x) = f x
 
 -- | Return the possible value if it exists; otherwise, the second argument.
 --
@@ -62,10 +58,9 @@ bindOptional f (Full a) =
   Optional a
   -> a
   -> a
-Empty ?? a =
-  a
-Full a ?? _ =
-  a
+(Full x) ?? _ = x
+Empty ?? y = y
+
 -- | Try the first optional for a value. If it has a value, use it; otherwise,
 -- use the second value.
 --
@@ -84,20 +79,22 @@ Full a ?? _ =
   Optional a
   -> Optional a
   -> Optional a
-Empty <+> x =
-  x
-Full a <+> _ =
-  Full a
+Empty <+> x = x
+Full x <+> _ = Full x
 
 applyOptional :: Optional (a -> b) -> Optional a -> Optional b
-applyOptional f a = bindOptional (\f' -> mapOptional (\a' -> f' a') a) f
+applyOptional Empty _ = Empty
+applyOptional _ Empty = Empty
+applyOptional (Full f) (Full x) = Full (f x)
 
 twiceOptional :: (a -> b -> c) -> Optional a -> Optional b -> Optional c
-twiceOptional f = applyOptional . mapOptional f
+twiceOptional _ Empty _ = Empty
+twiceOptional _ _ Empty = Empty
+twiceOptional f (Full x) (Full y) = Full (f x y)
 
 contains :: Eq a => a -> Optional a -> Bool
 contains _ Empty = False
-contains a (Full z) = a == z
+contains x (Full y) = x == y
 
 instance P.Functor Optional where
   fmap =
